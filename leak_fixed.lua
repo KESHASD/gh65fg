@@ -248,11 +248,9 @@ dropdownArrow.TextSize = 12
 -- Dropdown Menu
 local dropdownMenu = Instance.new("Frame")
 dropdownMenu.Name = "DropdownMenu"
-dropdownMenu.Parent = fieldComboBox
+dropdownMenu.Parent = screenGui
 dropdownMenu.BackgroundColor3 = Color3.new(0.216, 0.216, 0.294)
 dropdownMenu.BorderSizePixel = 0
-dropdownMenu.Position = UDim2.new(0, 0, 1, 2)
-dropdownMenu.Size = UDim2.new(0, 150, 0, 80)
 dropdownMenu.Visible = false
 dropdownMenu.ZIndex = 10
 local dropdownCorner = Instance.new("UICorner")
@@ -263,10 +261,10 @@ dropdownCorner.Parent = dropdownMenu
 local pineTreeOption = Instance.new("TextButton")
 pineTreeOption.Name = "PineTreeOption"
 pineTreeOption.Parent = dropdownMenu
-pineTreeOption.BackgroundColor3 = Color3.new(1, 1, 1)
-pineTreeOption.BackgroundTransparency = 1
+pineTreeOption.BackgroundColor3 = Color3.new(0.216, 0.216, 0.294)
+pineTreeOption.BorderSizePixel = 0
 pineTreeOption.Position = UDim2.new(0, 0, 0, 0)
-pineTreeOption.Size = UDim2.new(1, 0, 0, 40)
+pineTreeOption.Size = UDim2.new(0, 150, 0, 30)
 pineTreeOption.Font = Enum.Font.SourceSans
 pineTreeOption.Text = "Pine Tree Forest"
 pineTreeOption.TextColor3 = Color3.new(1, 1, 1)
@@ -276,15 +274,23 @@ pineTreeOption.TextXAlignment = Enum.TextXAlignment.Left
 local strawberryOption = Instance.new("TextButton")
 strawberryOption.Name = "StrawberryOption"
 strawberryOption.Parent = dropdownMenu
-strawberryOption.BackgroundColor3 = Color3.new(1, 1, 1)
-strawberryOption.BackgroundTransparency = 1
-strawberryOption.Position = UDim2.new(0, 0, 0, 40)
-strawberryOption.Size = UDim2.new(1, 0, 0, 40)
+strawberryOption.BackgroundColor3 = Color3.new(0.216, 0.216, 0.294)
+strawberryOption.BorderSizePixel = 0
+strawberryOption.Position = UDim2.new(0, 0, 0, 30)
+strawberryOption.Size = UDim2.new(0, 150, 0, 30)
 strawberryOption.Font = Enum.Font.SourceSans
 strawberryOption.Text = "Strawberry"
 strawberryOption.TextColor3 = Color3.new(1, 1, 1)
 strawberryOption.TextSize = 12
 strawberryOption.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Update dropdown menu position
+local function updateDropdownPosition()
+    local comboBoxPos = fieldComboBox.AbsolutePosition
+    local comboBoxSize = fieldComboBox.AbsoluteSize
+    dropdownMenu.Position = UDim2.new(0, comboBoxPos.X, 0, comboBoxPos.Y + comboBoxSize.Y)
+    dropdownMenu.Size = UDim2.new(0, 150, 0, 60)
+end
 
 -- Farm Settings Content
 local farmSettingsContent = Instance.new("Frame")
@@ -485,6 +491,7 @@ local dropdownOpen = false
 
 fieldComboBox.MouseButton1Click:Connect(function()
     dropdownOpen = not dropdownOpen
+    updateDropdownPosition()
     dropdownMenu.Visible = dropdownOpen
     dropdownArrow.Text = dropdownOpen and "^" or "v"
 end)
@@ -571,6 +578,13 @@ function startAutoFarm()
         end
     end
 end
+
+-- Update dropdown position when GUI moves
+RunService.Heartbeat:Connect(function()
+    if dropdownOpen then
+        updateDropdownPosition()
+    end
+end)
 
 -- Farming Loop
 RunService.Heartbeat:Connect(function()
