@@ -463,17 +463,21 @@ function switchTab(tabName)
         autoFarmTab.TextColor3 = Color3.new(1, 1, 1)
         farmSettingsTab.BackgroundColor3 = Color3.new(0.176, 0.176, 0.255)
         farmSettingsTab.TextColor3 = Color3.new(0.784, 0.784, 0.784)
-        -- Hide all sub-tabs
+        -- Show Auto Farm content, hide Farm Settings
         autoFarmContent.Visible = true
         farmSettingsContent.Visible = false
+        farmingSubTab.Visible = true
+        autoFarmSection.Visible = true
     elseif tabName == "FarmSettings" then
         farmSettingsTab.BackgroundColor3 = Color3.new(0.255, 0.412, 0.882)
         farmSettingsTab.TextColor3 = Color3.new(1, 1, 1)
         autoFarmTab.BackgroundColor3 = Color3.new(0.176, 0.176, 0.255)
         autoFarmTab.TextColor3 = Color3.new(0.784, 0.784, 0.784)
-        -- Show Farm Settings sub-tab
+        -- Show Farm Settings content
         autoFarmContent.Visible = true
         farmSettingsContent.Visible = true
+        farmingSubTab.Visible = false
+        autoFarmSection.Visible = false
     end
 end
 
