@@ -551,67 +551,83 @@ local function makeSlider(parent, text, state)
     return Wrap
 end
 
--- ── COMBOBOX (single select, always-visible scroll list) ──
+-- ── COMBOBOX (single select, scrollable) ─────────────
 local function makeCombobox(parent, titleText, options, stateRef)
-    local ITEM_H = 26
-    local HDR_H  = 22
+    local ITEM_H = 28
+    local HDR_H  = 38
     local LIST_H = 130
-    local TOTAL  = HDR_H + 4 + LIST_H
+    local open   = false
 
     local Outer = Instance.new("Frame")
-    Outer.Size  = UDim2.new(1, 0, 0, TOTAL)
-    Outer.BackgroundColor3 = T.DropBG
-    Outer.BorderSizePixel  = 0
-    Outer.ClipsDescendants = true
+    Outer.Size  = UDim2.new(1, 0, 0, HDR_H)
+    Outer.BackgroundTransparency = 1
+    Outer.ClipsDescendants = false
+    Outer.ZIndex = 8
     Outer.Parent = parent
-    corner(Outer, 8)
-    stroke(Outer, T.CardBorder, 1, 0.3)
 
-    -- header label row
-    local HdrRow = Instance.new("Frame")
-    HdrRow.Size  = UDim2.new(1, 0, 0, HDR_H)
-    HdrRow.BackgroundColor3 = Color3.fromRGB(28, 28, 46)
-    HdrRow.BorderSizePixel  = 0
-    HdrRow.Parent = Outer
+    local Hdr = Instance.new("TextButton")
+    Hdr.Size  = UDim2.new(1, 0, 0, HDR_H)
+    Hdr.BackgroundColor3 = T.DropBG
+    Hdr.BorderSizePixel  = 0
+    Hdr.Text  = ""
+    Hdr.ZIndex = 9
+    Hdr.Parent = Outer
+    corner(Hdr, 8)
+    stroke(Hdr, T.CardBorder, 1, 0.3)
 
     local HdrIcon = Instance.new("TextLabel")
     HdrIcon.Text  = "📍"
-    HdrIcon.Size  = UDim2.new(0, 22, 1, 0)
+    HdrIcon.Size  = UDim2.new(0, 28, 1, 0)
     HdrIcon.Position = UDim2.new(0, 6, 0, 0)
     HdrIcon.BackgroundTransparency = 1
-    HdrIcon.TextSize = 12
-    HdrIcon.Parent = HdrRow
+    HdrIcon.TextSize = 14
+    HdrIcon.ZIndex = 10
+    HdrIcon.Parent = Hdr
 
     local HdrLbl = Instance.new("TextLabel")
-    HdrLbl.Text  = titleText
-    HdrLbl.Size  = UDim2.new(1, -30, 1, 0)
-    HdrLbl.Position = UDim2.new(0, 28, 0, 0)
+    HdrLbl.Size  = UDim2.new(1, -68, 1, 0)
+    HdrLbl.Position = UDim2.new(0, 34, 0, 0)
     HdrLbl.BackgroundTransparency = 1
     HdrLbl.TextColor3 = T.TextSecond
-    HdrLbl.TextSize   = 11
-    HdrLbl.Font  = Enum.Font.GothamBold
+    HdrLbl.TextSize   = 13
+    HdrLbl.Font  = Enum.Font.Gotham
     HdrLbl.TextXAlignment = Enum.TextXAlignment.Left
-    HdrLbl.LetterSpacing  = 1
-    HdrLbl.Parent = HdrRow
+    HdrLbl.Text  = titleText
+    HdrLbl.ZIndex = 10
+    HdrLbl.Parent = Hdr
 
-    -- divider
-    local Sep = Instance.new("Frame")
-    Sep.Size  = UDim2.new(1, 0, 0, 1)
-    Sep.Position = UDim2.new(0, 0, 0, HDR_H)
-    Sep.BackgroundColor3 = T.Divider
-    Sep.BorderSizePixel  = 0
-    Sep.Parent = Outer
+    local Arrow = Instance.new("TextLabel")
+    Arrow.Size  = UDim2.new(0, 28, 1, 0)
+    Arrow.Position = UDim2.new(1, -30, 0, 0)
+    Arrow.BackgroundTransparency = 1
+    Arrow.TextColor3 = T.TextSecond
+    Arrow.TextSize   = 14
+    Arrow.Font  = Enum.Font.GothamBold
+    Arrow.Text  = "⌄"
+    Arrow.ZIndex = 10
+    Arrow.Parent = Hdr
 
-    -- scroll list
+    local DropWrap = Instance.new("Frame")
+    DropWrap.Size  = UDim2.new(1, 0, 0, LIST_H)
+    DropWrap.Position = UDim2.new(0, 0, 0, HDR_H + 4)
+    DropWrap.BackgroundColor3 = T.DropBG
+    DropWrap.BorderSizePixel  = 0
+    DropWrap.Visible = false
+    DropWrap.ZIndex  = 20
+    DropWrap.ClipsDescendants = true
+    DropWrap.Parent  = Outer
+    corner(DropWrap, 8)
+    stroke(DropWrap, T.CardBorder, 1, 0.2)
+
     local Scroll = Instance.new("ScrollingFrame")
-    Scroll.Size  = UDim2.new(1, 0, 0, LIST_H)
-    Scroll.Position = UDim2.new(0, 0, 0, HDR_H + 4)
+    Scroll.Size  = UDim2.new(1, 0, 1, 0)
     Scroll.BackgroundTransparency = 1
     Scroll.BorderSizePixel = 0
     Scroll.ScrollBarThickness = 3
     Scroll.ScrollBarImageColor3 = T.Accent
     Scroll.CanvasSize = UDim2.new(0, 0, 0, #options * (ITEM_H + 3) + 8)
-    Scroll.Parent = Outer
+    Scroll.ZIndex = 21
+    Scroll.Parent = DropWrap
 
     local DdList = Instance.new("UIListLayout")
     DdList.SortOrder = Enum.SortOrder.LayoutOrder
@@ -622,9 +638,22 @@ local function makeCombobox(parent, titleText, options, stateRef)
     DdPad.PaddingTop    = UDim.new(0, 4)
     DdPad.PaddingLeft   = UDim.new(0, 5)
     DdPad.PaddingRight  = UDim.new(0, 5)
+    DdPad.PaddingBottom = UDim.new(0, 4)
     DdPad.Parent = Scroll
 
     local allRows = {}
+
+    local function refreshHeader()
+        if stateRef.value and stateRef.value ~= "" then
+            HdrLbl.Text      = stateRef.value
+            HdrLbl.TextColor3 = T.TextPrimary
+            HdrLbl.Font      = Enum.Font.GothamBold
+        else
+            HdrLbl.Text      = titleText
+            HdrLbl.TextColor3 = T.TextSecond
+            HdrLbl.Font      = Enum.Font.Gotham
+        end
+    end
 
     local function refreshAllRows()
         for _, r in ipairs(allRows) do
@@ -632,9 +661,10 @@ local function makeCombobox(parent, titleText, options, stateRef)
             TweenService:Create(r.row, TI, {BackgroundColor3 = sel and T.DropSel or T.DropItem}):Play()
             r.lbl.TextColor3 = sel and T.TextWhite or T.TextPrimary
             r.lbl.Font       = sel and Enum.Font.GothamBold or Enum.Font.Gotham
-            if r.dot then r.dot.Visible = sel end
         end
     end
+
+    refreshHeader()
 
     for _, opt in ipairs(options) do
         local Row = Instance.new("TextButton")
@@ -642,31 +672,23 @@ local function makeCombobox(parent, titleText, options, stateRef)
         Row.BackgroundColor3 = T.DropItem
         Row.BorderSizePixel  = 0
         Row.Text  = ""
+        Row.ZIndex = 22
         Row.Parent = Scroll
-        corner(Row, 5)
-
-        -- selected dot indicator
-        local Dot = Instance.new("Frame")
-        Dot.Size  = UDim2.new(0, 6, 0, 6)
-        Dot.Position = UDim2.new(0, 7, 0.5, -3)
-        Dot.BackgroundColor3 = T.Accent
-        Dot.BorderSizePixel  = 0
-        Dot.Visible = false
-        Dot.Parent = Row
-        corner(Dot, 3)
+        corner(Row, 6)
 
         local OptLbl = Instance.new("TextLabel")
         OptLbl.Text  = opt
-        OptLbl.Size  = UDim2.new(1, -22, 1, 0)
-        OptLbl.Position = UDim2.new(0, 18, 0, 0)
+        OptLbl.Size  = UDim2.new(1, -16, 1, 0)
+        OptLbl.Position = UDim2.new(0, 10, 0, 0)
         OptLbl.BackgroundTransparency = 1
         OptLbl.TextColor3 = T.TextPrimary
         OptLbl.TextSize   = 12
         OptLbl.Font  = Enum.Font.Gotham
         OptLbl.TextXAlignment = Enum.TextXAlignment.Left
+        OptLbl.ZIndex = 23
         OptLbl.Parent = Row
 
-        table.insert(allRows, {row = Row, lbl = OptLbl, opt = opt, dot = Dot})
+        table.insert(allRows, {row = Row, lbl = OptLbl, opt = opt})
 
         Row.MouseEnter:Connect(function()
             if stateRef.value ~= opt then
@@ -680,84 +702,113 @@ local function makeCombobox(parent, titleText, options, stateRef)
         end)
         Row.MouseButton1Click:Connect(function()
             stateRef.value = opt
+            refreshHeader()
             refreshAllRows()
+            open = false
+            DropWrap.Visible = false
+            TweenService:Create(Arrow, TI, {Rotation = 0}):Play()
+            Outer.Size = UDim2.new(1, 0, 0, HDR_H)
         end)
     end
+
+    Hdr.MouseButton1Click:Connect(function()
+        open = not open
+        DropWrap.Visible = open
+        TweenService:Create(Arrow, TI, {Rotation = open and 180 or 0}):Play()
+        Outer.Size = UDim2.new(1, 0, 0, open and (HDR_H + 4 + LIST_H) or HDR_H)
+    end)
 
     return Outer
 end
 
--- ── MULTISELECT (always-visible scroll list with checkboxes) ──
+-- ── MULTISELECT ───────────────────────────────────────
 local function makeMultiselect(parent, titleText, options, selectedSet)
-    local ITEM_H = 26
-    local HDR_H  = 22
-    local LIST_H = 150
-    local TOTAL  = HDR_H + 4 + LIST_H
+    local ITEM_H = 28
+    local HDR_H  = 38
+    local LIST_H = 160
+    local open   = false
 
     local Outer = Instance.new("Frame")
-    Outer.Size  = UDim2.new(1, 0, 0, TOTAL)
-    Outer.BackgroundColor3 = T.DropBG
-    Outer.BorderSizePixel  = 0
-    Outer.ClipsDescendants = true
+    Outer.Size  = UDim2.new(1, 0, 0, HDR_H)
+    Outer.BackgroundTransparency = 1
+    Outer.ClipsDescendants = false
+    Outer.ZIndex = 8
     Outer.Parent = parent
-    corner(Outer, 8)
-    stroke(Outer, T.CardBorder, 1, 0.3)
 
-    -- header row with count badge
-    local HdrRow = Instance.new("Frame")
-    HdrRow.Size  = UDim2.new(1, 0, 0, HDR_H)
-    HdrRow.BackgroundColor3 = Color3.fromRGB(28, 28, 46)
-    HdrRow.BorderSizePixel  = 0
-    HdrRow.Parent = Outer
+    local Hdr = Instance.new("TextButton")
+    Hdr.Size  = UDim2.new(1, 0, 0, HDR_H)
+    Hdr.BackgroundColor3 = T.DropBG
+    Hdr.BorderSizePixel  = 0
+    Hdr.Text  = ""
+    Hdr.ZIndex = 9
+    Hdr.Parent = Outer
+    corner(Hdr, 8)
+    stroke(Hdr, T.CardBorder, 1, 0.3)
 
     local HdrLbl = Instance.new("TextLabel")
-    HdrLbl.Text  = titleText:upper()
     HdrLbl.Size  = UDim2.new(1, -50, 1, 0)
-    HdrLbl.Position = UDim2.new(0, 10, 0, 0)
+    HdrLbl.Position = UDim2.new(0, 12, 0, 0)
     HdrLbl.BackgroundTransparency = 1
     HdrLbl.TextColor3 = T.TextSecond
-    HdrLbl.TextSize   = 11
-    HdrLbl.Font  = Enum.Font.GothamBold
+    HdrLbl.TextSize   = 13
+    HdrLbl.Font  = Enum.Font.Gotham
     HdrLbl.TextXAlignment = Enum.TextXAlignment.Left
-    HdrLbl.LetterSpacing  = 1
-    HdrLbl.Parent = HdrRow
+    HdrLbl.Text  = titleText
+    HdrLbl.ZIndex = 10
+    HdrLbl.Parent = Hdr
 
     local CountBadge = Instance.new("Frame")
-    CountBadge.Size  = UDim2.new(0, 26, 0, 16)
-    CountBadge.Position = UDim2.new(1, -32, 0.5, -8)
+    CountBadge.Size  = UDim2.new(0, 24, 0, 20)
+    CountBadge.Position = UDim2.new(1, -52, 0.5, -10)
     CountBadge.BackgroundColor3 = T.AccentDim
     CountBadge.BorderSizePixel  = 0
     CountBadge.Visible = false
-    CountBadge.Parent  = HdrRow
-    corner(CountBadge, 5)
+    CountBadge.ZIndex  = 10
+    CountBadge.Parent  = Hdr
+    corner(CountBadge, 6)
 
     local CountLbl = Instance.new("TextLabel")
     CountLbl.Size  = UDim2.new(1, 0, 1, 0)
     CountLbl.BackgroundTransparency = 1
     CountLbl.TextColor3 = T.TextAccent
-    CountLbl.TextSize   = 10
+    CountLbl.TextSize   = 11
     CountLbl.Font  = Enum.Font.GothamBold
     CountLbl.Text  = "0"
+    CountLbl.ZIndex = 11
     CountLbl.Parent = CountBadge
 
-    -- divider
-    local Sep = Instance.new("Frame")
-    Sep.Size  = UDim2.new(1, 0, 0, 1)
-    Sep.Position = UDim2.new(0, 0, 0, HDR_H)
-    Sep.BackgroundColor3 = T.Divider
-    Sep.BorderSizePixel  = 0
-    Sep.Parent = Outer
+    local Arrow = Instance.new("TextLabel")
+    Arrow.Size  = UDim2.new(0, 28, 1, 0)
+    Arrow.Position = UDim2.new(1, -30, 0, 0)
+    Arrow.BackgroundTransparency = 1
+    Arrow.TextColor3 = T.TextSecond
+    Arrow.TextSize   = 14
+    Arrow.Font  = Enum.Font.GothamBold
+    Arrow.Text  = "⌄"
+    Arrow.ZIndex = 10
+    Arrow.Parent = Hdr
 
-    -- scroll list
+    local DropWrap = Instance.new("Frame")
+    DropWrap.Size  = UDim2.new(1, 0, 0, LIST_H)
+    DropWrap.Position = UDim2.new(0, 0, 0, HDR_H + 4)
+    DropWrap.BackgroundColor3 = T.DropBG
+    DropWrap.BorderSizePixel  = 0
+    DropWrap.Visible = false
+    DropWrap.ZIndex  = 20
+    DropWrap.ClipsDescendants = true
+    DropWrap.Parent  = Outer
+    corner(DropWrap, 8)
+    stroke(DropWrap, T.CardBorder, 1, 0.2)
+
     local Scroll = Instance.new("ScrollingFrame")
-    Scroll.Size  = UDim2.new(1, 0, 0, LIST_H)
-    Scroll.Position = UDim2.new(0, 0, 0, HDR_H + 4)
+    Scroll.Size  = UDim2.new(1, 0, 1, 0)
     Scroll.BackgroundTransparency = 1
     Scroll.BorderSizePixel = 0
     Scroll.ScrollBarThickness = 3
     Scroll.ScrollBarImageColor3 = T.Accent
     Scroll.CanvasSize = UDim2.new(0, 0, 0, #options * (ITEM_H + 3) + 8)
-    Scroll.Parent = Outer
+    Scroll.ZIndex = 21
+    Scroll.Parent = DropWrap
 
     local DdList = Instance.new("UIListLayout")
     DdList.SortOrder = Enum.SortOrder.LayoutOrder
@@ -768,13 +819,22 @@ local function makeMultiselect(parent, titleText, options, selectedSet)
     DdPad.PaddingTop    = UDim.new(0, 4)
     DdPad.PaddingLeft   = UDim.new(0, 5)
     DdPad.PaddingRight  = UDim.new(0, 5)
+    DdPad.PaddingBottom = UDim.new(0, 4)
     DdPad.Parent = Scroll
 
     local function refreshCount()
         local n = 0
         for _ in pairs(selectedSet) do n = n + 1 end
-        CountBadge.Visible = n > 0
-        CountLbl.Text = tostring(n)
+        if n > 0 then
+            CountBadge.Visible = true
+            CountLbl.Text = tostring(n)
+            HdrLbl.TextColor3 = T.TextPrimary
+            HdrLbl.Font = Enum.Font.GothamBold
+        else
+            CountBadge.Visible = false
+            HdrLbl.TextColor3 = T.TextSecond
+            HdrLbl.Font = Enum.Font.Gotham
+        end
     end
     refreshCount()
 
@@ -784,36 +844,40 @@ local function makeMultiselect(parent, titleText, options, selectedSet)
         Row.BackgroundColor3 = T.DropItem
         Row.BorderSizePixel  = 0
         Row.Text  = ""
+        Row.ZIndex = 22
         Row.Parent = Scroll
-        corner(Row, 5)
+        corner(Row, 6)
 
         local Chk = Instance.new("Frame")
-        Chk.Size  = UDim2.new(0, 14, 0, 14)
-        Chk.Position = UDim2.new(0, 7, 0.5, -7)
+        Chk.Size  = UDim2.new(0, 16, 0, 16)
+        Chk.Position = UDim2.new(0, 7, 0.5, -8)
         Chk.BackgroundColor3 = T.CbOff
         Chk.BorderSizePixel  = 0
+        Chk.ZIndex = 23
         Chk.Parent = Row
-        corner(Chk, 3)
+        corner(Chk, 4)
 
         local ChkTick = Instance.new("TextLabel")
         ChkTick.Text  = "✓"
         ChkTick.Size  = UDim2.new(1, 0, 1, 0)
         ChkTick.BackgroundTransparency = 1
         ChkTick.TextColor3 = T.TextWhite
-        ChkTick.TextSize   = 10
+        ChkTick.TextSize   = 11
         ChkTick.Font  = Enum.Font.GothamBold
         ChkTick.Visible = false
+        ChkTick.ZIndex  = 24
         ChkTick.Parent  = Chk
 
         local OptLbl = Instance.new("TextLabel")
         OptLbl.Text  = opt
-        OptLbl.Size  = UDim2.new(1, -30, 1, 0)
-        OptLbl.Position = UDim2.new(0, 28, 0, 0)
+        OptLbl.Size  = UDim2.new(1, -34, 1, 0)
+        OptLbl.Position = UDim2.new(0, 30, 0, 0)
         OptLbl.BackgroundTransparency = 1
         OptLbl.TextColor3 = T.TextPrimary
         OptLbl.TextSize   = 12
         OptLbl.Font  = Enum.Font.Gotham
         OptLbl.TextXAlignment = Enum.TextXAlignment.Left
+        OptLbl.ZIndex = 23
         OptLbl.Parent = Row
 
         local function refreshItem()
@@ -842,6 +906,13 @@ local function makeMultiselect(parent, titleText, options, selectedSet)
             refreshCount()
         end)
     end
+
+    Hdr.MouseButton1Click:Connect(function()
+        open = not open
+        DropWrap.Visible = open
+        TweenService:Create(Arrow, TI, {Rotation = open and 180 or 0}):Play()
+        Outer.Size = UDim2.new(1, 0, 0, open and (HDR_H + 4 + LIST_H) or HDR_H)
+    end)
 
     return Outer
 end
@@ -1156,8 +1227,6 @@ end
 -- ══════════════════════════════════════════════════════
 --  ACTIVATE DEFAULT TAB
 -- ══════════════════════════════════════════════════════
-sideButtons["Farm"].wrap.Parent:FindFirstChild("TextButton"):ForceLostFocus()
--- simulate click on Farm
 do
     local sb = sideButtons["Farm"]
     activeTab = "Farm"
