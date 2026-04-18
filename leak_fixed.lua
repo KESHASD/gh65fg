@@ -153,7 +153,7 @@ local autoFarmCorner = Instance.new("UICorner")
 autoFarmCorner.CornerRadius = UDim.new(0, 6)
 autoFarmCorner.Parent = autoFarmTab
 
--- Farm Settings Tab Button
+-- Farm Settings Sub-Tab Button (inside Auto Farm)
 local farmSettingsTab = Instance.new("TextButton")
 farmSettingsTab.Name = "FarmSettingsTab"
 farmSettingsTab.Parent = tabContainer
@@ -292,10 +292,10 @@ local function updateDropdownPosition()
     dropdownMenu.Size = UDim2.new(0, 150, 0, 60)
 end
 
--- Farm Settings Content
+-- Farm Settings Content (as sub-tab inside Auto Farm)
 local farmSettingsContent = Instance.new("Frame")
 farmSettingsContent.Name = "FarmSettingsContent"
-farmSettingsContent.Parent = contentContainer
+farmSettingsContent.Parent = autoFarmContent
 farmSettingsContent.BackgroundColor3 = Color3.new(1, 1, 1)
 farmSettingsContent.BackgroundTransparency = 1
 farmSettingsContent.BorderSizePixel = 0
@@ -439,20 +439,18 @@ local autoDigToggle = createToggle(autoFarmContent, "Auto Dig", UDim2.new(0, 20,
 local farmOptionsSection = createSection(farmSettingsContent, "Farm Options", UDim2.new(0, 20, 0, 20))
 
 -- Farm Options Multi-select
-local farmPetalsToggle = createToggle(farmOptionsSection, "Farm Petals", UDim2.new(0, 0, 0, 0), false)
+local farmMarksToggle = createToggle(farmOptionsSection, "Farm Marks", UDim2.new(0, 0, 0, 0), false)
 local farmBubblesToggle = createToggle(farmOptionsSection, "Farm Bubbles", UDim2.new(0, 0, 0, 40), false)
-local farmBloomsToggle = createToggle(farmOptionsSection, "Farm Blooms", UDim2.new(0, 0, 0, 80), false)
-local farmLeavesToggle = createToggle(farmOptionsSection, "Farm Leaves", UDim2.new(0, 0, 0, 120), false)
-local farmMarksToggle = createToggle(farmOptionsSection, "Farm Marks", UDim2.new(0, 200, 0, 0), false)
-local ignoreHoneyToggle = createToggle(farmOptionsSection, "Ignore Honey Tokens", UDim2.new(0, 200, 0, 40), false)
-local farmUnderBalloonsToggle = createToggle(farmOptionsSection, "Farm Under Balloons", UDim2.new(0, 200, 0, 80), false)
+local ignoreHoneyToggle = createToggle(farmOptionsSection, "Ignore Honey Tokens", UDim2.new(0, 0, 0, 80), false)
+local farmBloomsToggle = createToggle(farmOptionsSection, "Farm Blooms", UDim2.new(0, 200, 0, 0), false)
+local farmUnderBalloonsToggle = createToggle(farmOptionsSection, "Farm Under Balloons", UDim2.new(0, 200, 0, 40), false)
+local farmLeavesToggle = createToggle(farmOptionsSection, "Farm Leaves", UDim2.new(0, 200, 0, 80), false)
 
 -- Priority Tokens Section
 local priorityTokensSection = createSection(farmSettingsContent, "Priority Tokens", UDim2.new(0, 20, 0, 220))
 
 -- Priority Tokens Multi-select
-local blueBoostToggle = createToggle(priorityTokensSection, "Blue Boost", UDim2.new(0, 0, 0, 0), false)
-local inflateBalloonToggle = createToggle(priorityTokensSection, "Inflate Balloon", UDim2.new(0, 0, 0, 40), false)
+local inflateBalloonToggle = createToggle(priorityTokensSection, "Inflate Balloon", UDim2.new(0, 0, 0, 0), false)
 
 -- Tab Switching Logic
 local currentTab = "AutoFarm"
@@ -466,14 +464,16 @@ function switchTab(tabName)
         autoFarmTab.TextColor3 = Color3.new(1, 1, 1)
         farmSettingsTab.BackgroundColor3 = Color3.new(0.176, 0.176, 0.255)
         farmSettingsTab.TextColor3 = Color3.new(0.784, 0.784, 0.784)
+        -- Hide all sub-tabs
         autoFarmContent.Visible = true
         farmSettingsContent.Visible = false
-    else
+    elseif tabName == "FarmSettings" then
         farmSettingsTab.BackgroundColor3 = Color3.new(0.255, 0.412, 0.882)
         farmSettingsTab.TextColor3 = Color3.new(1, 1, 1)
         autoFarmTab.BackgroundColor3 = Color3.new(0.176, 0.176, 0.255)
         autoFarmTab.TextColor3 = Color3.new(0.784, 0.784, 0.784)
-        autoFarmContent.Visible = false
+        -- Show Farm Settings sub-tab
+        autoFarmContent.Visible = true
         farmSettingsContent.Visible = true
     end
 end
