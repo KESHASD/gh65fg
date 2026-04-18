@@ -189,6 +189,14 @@ autoFarmContent.Position = UDim2.new(0, 0, 0, 0)
 autoFarmContent.Size = UDim2.new(1, 0, 1, 0)
 autoFarmContent.Visible = true
 
+-- Auto Farm Section
+local autoFarmSection = createSection(autoFarmContent, "Auto Farm", UDim2.new(0, 20, 0, 20))
+
+-- Auto Farm Toggles
+local autoFarmToggle = createToggle(autoFarmSection, "Auto Farm", UDim2.new(0, 0, 0, 0), false)
+local autoSprinklerToggle = createToggle(autoFarmSection, "Auto Sprinkler", UDim2.new(0, 0, 0, 40), false)
+local autoDigToggle = createToggle(autoFarmSection, "Auto Dig", UDim2.new(0, 0, 0, 80), false)
+
 -- Farming Sub-tab Container
 local farmingSubTab = Instance.new("Frame")
 farmingSubTab.Name = "FarmingSubTab"
@@ -425,15 +433,6 @@ function createSection(parent, sectionTitle, position)
 
     return section
 end
-
--- Auto Farm Toggle
-local autoFarmToggle = createToggle(autoFarmContent, "Auto Farm", UDim2.new(0, 20, 0, 80), false)
-
--- Auto Sprinkler Toggle
-local autoSprinklerToggle = createToggle(autoFarmContent, "Auto Sprinkler", UDim2.new(0, 20, 0, 130), false)
-
--- Auto Dig Toggle
-local autoDigToggle = createToggle(autoFarmContent, "Auto Dig", UDim2.new(0, 20, 0, 180), false)
 
 -- Farm Options Section
 local farmOptionsSection = createSection(farmSettingsContent, "Farm Options", UDim2.new(0, 20, 0, 20))
